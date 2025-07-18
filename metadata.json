@@ -1,0 +1,6 @@
+{
+  "name": "AI Research Assistant",
+  "description": "An application that allows users to enter a topic of interest, generates a comprehensive text report using the latest information from various sources, and provides an audio version of the report.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
