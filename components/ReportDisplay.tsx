@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { GroundingSource } from '../types';
 import { generatePdf, cleanMarkdownForPlainText } from '../utils/pdfGenerator';
+import { generateDocx } from '../utils/docxGenerator';
 import PodcastPlayer from './PodcastPlayer';
 import Markdown from 'react-markdown';
-import { DownloadIcon, PodcastIcon, ShareIcon, SourceIcon } from './Icons';
+import { DownloadIcon, PodcastIcon, ShareIcon, SourceIcon, WordIcon } from './Icons';
 
 interface ReportDisplayProps {
   topic: string;
@@ -12,22 +13,34 @@ interface ReportDisplayProps {
 }
 
 const ReportDisplay: React.FC<ReportDisplayProps> = ({ topic, report, sources }) => {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isDownloadingDocx, setIsDownloadingDocx] = useState(false);
   const [showPodcast, setShowPodcast] = useState(false);
 
   const plainTextReport = useMemo(() => cleanMarkdownForPlainText(report), [report]);
   const isShareSupported = typeof navigator.share === 'function';
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
+  const handleDownloadPdf = async () => {
+    setIsDownloadingPdf(true);
     try {
-      // Pass the raw report; cleaning is handled inside generatePdf
       await generatePdf(report, topic);
     } catch (error) {
       console.error("PDF generation failed", error);
       alert("Could not generate PDF. Please try again.");
     } finally {
-      setIsDownloading(false);
+      setIsDownloadingPdf(false);
+    }
+  };
+
+  const handleDownloadDocx = async () => {
+    setIsDownloadingDocx(true);
+    try {
+      await generateDocx(report, topic);
+    } catch (error) {
+      console.error("DOCX generation failed", error);
+      alert("Could not generate Word document. Please try again.");
+    } finally {
+      setIsDownloadingDocx(false);
     }
   };
 
@@ -54,7 +67,7 @@ const ReportDisplay: React.FC<ReportDisplayProps> = ({ topic, report, sources })
     <div className="mt-8 bg-gray-800/50 border border-gray-700 rounded-xl shadow-2xl p-6 animate-fade-in">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h2 className="text-2xl font-bold text-teal-300">Risultati della Ricerca</h2>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center flex-wrap justify-end gap-3">
           <button
             onClick={togglePodcast}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-300 ${showPodcast ? 'bg-purple-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
@@ -75,12 +88,23 @@ const ReportDisplay: React.FC<ReportDisplayProps> = ({ topic, report, sources })
           )}
 
           <button
-            onClick={handleDownload}
-            disabled={isDownloading}
+            onClick={handleDownloadDocx}
+            disabled={isDownloadingDocx}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-blue-800 disabled:cursor-wait"
+            title="Scarica il report come documento Word"
+          >
+            <WordIcon className="w-5 h-5" />
+            <span>{isDownloadingDocx ? 'Scaricando...' : 'Download Word'}</span>
+          </button>
+
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300 disabled:bg-green-800 disabled:cursor-wait"
+            title="Scarica il report come documento PDF"
           >
             <DownloadIcon className="w-5 h-5" />
-            <span>{isDownloading ? 'Downloading...' : 'Download PDF'}</span>
+            <span>{isDownloadingPdf ? 'Scaricando...' : 'Download PDF'}</span>
           </button>
         </div>
       </div>
