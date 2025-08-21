@@ -87,3 +87,5 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, isLoading }) => {
     </form>
   );
 };
+
+export default SearchBar;
