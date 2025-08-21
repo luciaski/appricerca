@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = useCallback(async (searchTopic: string) => {
+  const handleSearch = useCallback(async (searchTopic: string, instructions: string) => {
     if (!searchTopic.trim()) {
       setError('Please enter a topic.');
       return;
@@ -26,7 +26,7 @@ const App: React.FC = () => {
     setTopic(searchTopic);
 
     try {
-      const result = await generateReport(searchTopic);
+      const result = await generateReport(searchTopic, instructions);
       if (result) {
         setReport(result.text);
         setSources(result.sources);
@@ -67,4 +67,5 @@ const App: React.FC = () => {
   );
 };
 
+export default App;
 export default App;
